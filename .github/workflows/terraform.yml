@@ -17,7 +17,7 @@ env:
   AWS_REGION: "us-east-1"
   AWS_ROLE_TO_ASSUME: "arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-terraform-eks"
   TF_WORKSPACE: "default"
-  CONFIG_DIRECTORY: "./cloud-learning/multi-cloud-repo/environments/dev/aws/compute"
+  CONFIG_DIRECTORY: "./environments/dev/aws/compute"
   
   # Azure OIDC Configuration (Read natively by the azurerm provider)
   #ARM_USE_OIDC: "true"
