@@ -43,7 +43,10 @@ jobs:
         aws-region: ${{ env.AWS_REGION }}
         audience: sts.amazonaws.com
 
-
+    - name: Setup Terraform CLI
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.7.0"
 
     # 4. Check Code Formatting
     - name: Terraform Format Check
