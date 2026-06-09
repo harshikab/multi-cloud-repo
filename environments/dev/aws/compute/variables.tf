@@ -82,3 +82,9 @@ variable "AWS_ACCOUNT_ID" {
   description = "The AWS account ID for the EC2 instances to allow cross-account access"
 
 }
+
+variable "log_sharing_bucket_id" {
+  type        = string
+  description = "The ID of the S3 bucket to share logs with across accounts"
+  default     = "harshika-s3-logging"
+}
