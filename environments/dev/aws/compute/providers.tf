@@ -13,8 +13,8 @@ provider "aws" {
 }
 
 provider "aws" {
-   alias  = "destination"
-   region = var.region
+  alias  = "destination"
+  region = var.region
 
   default_tags {
     tags = var.common_tags

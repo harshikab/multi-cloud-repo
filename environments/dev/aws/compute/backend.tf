@@ -6,11 +6,11 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "harshika-terrafrom-state" 
-    key    = "dev/compute/terraform.tfstate"
-    region = "us-east-1"
-    profile= ""
-    encrypt = true
+    bucket       = "harshika-terrafrom-state"
+    key          = "dev/compute/terraform.tfstate"
+    region       = "us-east-1"
+    profile      = ""
+    encrypt      = true
     use_lockfile = true
   }
 }
