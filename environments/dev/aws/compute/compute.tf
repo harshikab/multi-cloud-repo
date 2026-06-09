@@ -56,6 +56,7 @@ resource "aws_kms_alias" "s3_encryption_alias" {
   target_key_id = aws_kms_key.s3_encryption_key.key_id
 }
 
+# bridgecrew:skip=CKV_AWS_144: Replication not required for this environment
 # Create s3 buckets with different configurations to demonstrate dependencies and best practices
 resource "aws_s3_bucket" "s3-bucket-primary" {
   provider = aws.destination
@@ -114,7 +115,22 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "primary_encryptio
   }
 }
 
+# Lifecycle for Primary Buckets
+resource "aws_s3_bucket_lifecycle_configuration_v2" "primary_lifecycle" {
+  provider = aws.destination
+  count    = length(var.bucket_name)
+  bucket   = aws_s3_bucket.s3-bucket-primary[count.index].id
 
+  rule {
+    id     = "abort-incomplete-multipart"
+    status = "Enabled"
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+# bridgecrew:skip=CKV_AWS_144: Replication not required for this environment
 resource "aws_s3_bucket" "s3-bucket-dependent" {
   provider = aws.destination
   for_each = var.dependent_bucket_name
@@ -127,8 +143,8 @@ resource "aws_s3_bucket" "s3-bucket-dependent" {
 # Block public access for the dependent buckets and enable versioning
 resource "aws_s3_bucket_public_access_block" "dependent_fast_follow" {
   provider = aws.destination
-  count    = length(var.bucket_name)
-  bucket   = aws_s3_bucket.s3-bucket-dependent[count.index].id
+  for_each    = var.dependent_bucket_name
+  bucket   = aws_s3_bucket.s3-bucket-dependent[each.key].id
 
   # FIX: AWS-0086, AWS-0087, AWS-0091, AWS-0093, AWS-0094
   block_public_acls       = true
@@ -139,8 +155,8 @@ resource "aws_s3_bucket_public_access_block" "dependent_fast_follow" {
 
 resource "aws_s3_bucket_versioning" "dependent_versioning" {
   provider = aws.destination
-  count    = length(var.bucket_name)
-  bucket   = aws_s3_bucket.s3-bucket-dependent[count.index].id
+  for_each    = var.dependent_bucket_name
+  bucket   = aws_s3_bucket.s3-bucket-dependent[each.key].id
 
   versioning_configuration {
     status = "Enabled" # FIX: AWS-0090
@@ -149,17 +165,17 @@ resource "aws_s3_bucket_versioning" "dependent_versioning" {
 # Logging configuration for the dependent buckets to demonstrate cross-account access and logging best practices
 resource "aws_s3_bucket_logging" "dependent_logging" {
   provider = aws.destination
-  count    = length(var.bucket_name)
-  bucket   = aws_s3_bucket.s3-bucket-dependent[count.index].id
+  for_each    = var.dependent_bucket_name
+  bucket   = aws_s3_bucket.s3-bucket-dependent[each.key].id
 
   target_bucket = var.log_sharing_bucket_id # FIX: AWS-0089
-  target_prefix = "log/dependent-${count.index}/"
+  target_prefix = "log/dependent-${each.key}/"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "dependent_encryption" {
   provider = aws.destination
-  count    = length(var.bucket_name)
-  bucket   = aws_s3_bucket.s3-bucket-dependent[count.index].id
+  for_each    = var.dependent_bucket_name
+  bucket   = aws_s3_bucket.s3-bucket-dependent[each.key].id
 
   rule {
     bucket_key_enabled = true #  CRITICAL: Drastically reduces S3-to-KMS API request costs
@@ -167,6 +183,21 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "dependent_encrypt
     apply_server_side_encryption_by_default {
       kms_master_key_id = var.s3_encryption_alias.arn # FIX: AWS-0132
       sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
+# Lifecycle for Dependent Buckets
+resource "aws_s3_bucket_lifecycle_configuration_v2" "dependent_lifecycle" {
+  provider = aws.destination
+  for_each = var.dependent_bucket_name
+  bucket   = aws_s3_bucket.s3-bucket-dependent[each.key].id
+
+  rule {
+    id     = "abort-incomplete-multipart"
+    status = "Enabled"
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
     }
   }
 }
