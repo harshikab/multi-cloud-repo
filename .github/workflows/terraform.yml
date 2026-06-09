@@ -1,0 +1,112 @@
+name: "Multi-Cloud Terraform CI/CD"
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+
+permissions:
+  id-token: write   # Required for requesting the JWT from GitHub OIDC
+  contents: read     # Required for actions/checkout
+  issues: write 
+  pull-requests: write  
+
+env:
+  # AWS OIDC Configuration
+  AWS_REGION: "us-east-1"
+  AWS_ROLE_TO_ASSUME: "arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-terraform-eks"
+  TF_WORKSPACE: "default"
+  CONFIG_DIRECTORY: "./cloud-learning/multi-cloud-repo/environments/dev/aws/compute"
+  
+  # Azure OIDC Configuration (Read natively by the azurerm provider)
+  #ARM_USE_OIDC: "true"
+  #ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+ # ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  #ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+jobs:
+  terraform:
+    name: "Terraform Plan & Apply"
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Checkout Code
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
+
+    # 2. Authenticate to AWS via OIDC
+    - name: Configure AWS Credentials via OIDC
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+        aws-region: ${{ env.AWS_REGION }}
+        audience: sts.amazonaws.com
+
+
+
+    # 4. Check Code Formatting
+    - name: Terraform Format Check
+      run: terraform fmt -check
+
+    # 5. Initialize Backend and Providers
+    - name: Terraform Init
+      run: terraform init
+
+    # 6. Run Security Scan (Static Analysis)
+    - name: Run Trivy Vulnerability Scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'config'
+        hide-progress: true
+        format: 'table'
+        exit-code: '1' # Set to 1 if you want to block the pipeline on security failures
+    
+    - name : Run Checkov Static Code Analysis
+      uses: bridgecrewio/checkov-action@master
+      with:
+        directory: './' # Path to your Terraform code
+        framework: 'terraform'
+        soft-fail: false # Set to true if you want to allow failures without blocking the pipeline
+
+    - name: TruffleHog OSS 
+      id: trufflehog 
+      uses: trufflesecurity/trufflehog@add-actions-cli-switch 
+      continue-on-error: true 
+      with: 
+        path: ./ 
+        base: "${{ github.event.repository.default_branch }}" 
+        head: HEAD 
+        extra_args: --debug --only-verified 
+    
+    - name: Scan for Secrets
+      id: trufflehog-secrets
+      if: steps.trufflehog.outcome == 'failure' 
+      run: exit 1
+
+    - name: Upload Configuration
+      uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
+      id: plan-upload
+      with:
+       workspace: ${{ env.TF_WORKSPACE }}
+       directory: ${{ env.CONFIG_DIRECTORY }}
+       speculative: true
+
+    - name: Create Plan Run
+      uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
+      id: plan-run
+      with:
+        workspace: ${{ env.TF_WORKSPACE }}
+        configuration_version: ${{ steps.plan-upload.outputs.configuration_version_id }}
+        plan_only: true
+
+    - name: Get Plan Output
+      uses: hashicorp/tfc-workflows-github/actions/plan-output@v1.0.0
+      id: plan-output
+      with:
+       plan: ${{ fromJSON(steps.plan-run.outputs.payload).data.relationships.plan.data.id }}
+
+    # 8. Apply Changes (Only on merge/push to main branch)
+    #- name: Terraform Apply
+    #  if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    #  run: terraform apply -auto-approve -input=false

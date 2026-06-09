@@ -1,0 +1,11 @@
+# Local .terraform directories
+.terraform/
+
+# Hide state files (should be saved in a remote AWS S3 bucket instead)
+*.tfstate
+*.tfstate.*
+
+# Exclude variable files containing secret AWS keys or passwords
+*.tfvars
+*.tfvars.json
+*.lock.hcl
