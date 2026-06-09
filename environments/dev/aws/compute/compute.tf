@@ -43,17 +43,17 @@ resource "aws_kms_key" "s3_encryption_key" {
   deletion_window_in_days = 7 # Drops it to the AWS minimum
   tags = merge(
     var.common_tags,
-     {
-       Name = "terraform-s3-encryption-key"
-     }
+    {
+      Name = "terraform-s3-encryption-key"
+    }
 
-  )  
+  )
 }
 
 resource "aws_kms_alias" "s3_encryption_alias" {
 
-   name          = "alias/s3_encryption_alias"
-   target_key_id = aws_kms_key.s3_encryption_key.key_id
+  name          = "alias/s3_encryption_alias"
+  target_key_id = aws_kms_key.s3_encryption_key.key_id
 }
 
 # Create s3 buckets with different configurations to demonstrate dependencies and best practices
@@ -62,7 +62,7 @@ resource "aws_s3_bucket" "s3-bucket-primary" {
   count    = length(var.bucket_name)
   bucket   = var.bucket_name[count.index]
   tags     = var.common_tags
-  
+
 
   depends_on = [aws_instance.web_server]
 }
@@ -84,7 +84,7 @@ resource "aws_s3_bucket_versioning" "primary_versioning" {
   provider = aws.destination
   count    = length(var.bucket_name)
   bucket   = aws_s3_bucket.s3-bucket-primary[count.index].id
-  
+
   versioning_configuration {
     status = "Enabled" # FIX: AWS-0090
   }
@@ -106,7 +106,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "primary_encryptio
 
   rule {
     bucket_key_enabled = true #  CRITICAL: Drastically reduces S3-to-KMS API request costs
-    
+
     apply_server_side_encryption_by_default {
       kms_master_key_id = var.s3_encryption_alias.arn # FIX: AWS-0132
       sse_algorithm     = "aws:kms"
@@ -141,7 +141,7 @@ resource "aws_s3_bucket_versioning" "dependent_versioning" {
   provider = aws.destination
   count    = length(var.bucket_name)
   bucket   = aws_s3_bucket.s3-bucket-dependent[count.index].id
-  
+
   versioning_configuration {
     status = "Enabled" # FIX: AWS-0090
   }
@@ -163,7 +163,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "dependent_encrypt
 
   rule {
     bucket_key_enabled = true #  CRITICAL: Drastically reduces S3-to-KMS API request costs
-    
+
     apply_server_side_encryption_by_default {
       kms_master_key_id = var.s3_encryption_alias.arn # FIX: AWS-0132
       sse_algorithm     = "aws:kms"
