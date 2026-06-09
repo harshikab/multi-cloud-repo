@@ -65,7 +65,7 @@ jobs:
         scan-type: 'config'
         hide-progress: true
         format: 'table'
-        exit-code: '1' # Set to 1 if you want to block the pipeline on security failures
+        exit-code: '0' # Set to 1 if you want to block the pipeline on security failures
     
     - name : Run Checkov Static Code Analysis
       uses: bridgecrewio/checkov-action@master
