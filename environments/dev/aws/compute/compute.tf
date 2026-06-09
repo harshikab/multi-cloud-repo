@@ -143,7 +143,7 @@ resource "aws_s3_bucket" "s3-bucket-dependent" {
 # Block public access for the dependent buckets and enable versioning
 resource "aws_s3_bucket_public_access_block" "dependent_fast_follow" {
   provider = aws.destination
-  for_each    = var.dependent_bucket_name
+  for_each = var.dependent_bucket_name
   bucket   = aws_s3_bucket.s3-bucket-dependent[each.key].id
 
   # FIX: AWS-0086, AWS-0087, AWS-0091, AWS-0093, AWS-0094
@@ -155,7 +155,7 @@ resource "aws_s3_bucket_public_access_block" "dependent_fast_follow" {
 
 resource "aws_s3_bucket_versioning" "dependent_versioning" {
   provider = aws.destination
-  for_each    = var.dependent_bucket_name
+  for_each = var.dependent_bucket_name
   bucket   = aws_s3_bucket.s3-bucket-dependent[each.key].id
 
   versioning_configuration {
@@ -165,7 +165,7 @@ resource "aws_s3_bucket_versioning" "dependent_versioning" {
 # Logging configuration for the dependent buckets to demonstrate cross-account access and logging best practices
 resource "aws_s3_bucket_logging" "dependent_logging" {
   provider = aws.destination
-  for_each    = var.dependent_bucket_name
+  for_each = var.dependent_bucket_name
   bucket   = aws_s3_bucket.s3-bucket-dependent[each.key].id
 
   target_bucket = var.log_sharing_bucket_id # FIX: AWS-0089
@@ -174,7 +174,7 @@ resource "aws_s3_bucket_logging" "dependent_logging" {
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "dependent_encryption" {
   provider = aws.destination
-  for_each    = var.dependent_bucket_name
+  for_each = var.dependent_bucket_name
   bucket   = aws_s3_bucket.s3-bucket-dependent[each.key].id
 
   rule {
