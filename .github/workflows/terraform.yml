@@ -72,7 +72,7 @@ jobs:
       with:
         directory: './environments/dev/aws/compute' # Path to your Terraform code
         framework: 'terraform'
-        soft-fail: true # Set to true if you want to allow failures without blocking the pipeline
+        soft_fail: true # Set to true if you want to allow failures without blocking the pipeline
 
     - name: TruffleHog OSS 
       id: trufflehog 
