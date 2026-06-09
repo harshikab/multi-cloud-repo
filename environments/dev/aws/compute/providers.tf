@@ -7,7 +7,7 @@ provider "aws" {
   }
 
   assume_role {
-    role_arn     = "arn:aws:iam::${var.EC2_ACCOUNT_ID}:role/EC2CreatorRole"
+    role_arn     = "arn:aws:iam::${var.AWS_ACCOUNT_ID}:role/EC2CreatorRole"
     session_name = "terraform-session"
   }
 }

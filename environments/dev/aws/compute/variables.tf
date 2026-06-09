@@ -77,7 +77,7 @@ variable "dependent_bucket_name" {
 }
 
 
-variable "EC2_ACCOUNT_ID" {
+variable "AWS_ACCOUNT_ID" {
   type        = string
   description = "The AWS account ID for the EC2 instances to allow cross-account access"
 
