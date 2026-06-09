@@ -70,7 +70,7 @@ jobs:
     - name : Run Checkov Static Code Analysis
       uses: bridgecrewio/checkov-action@master
       with:
-        directory: './' # Path to your Terraform code
+        directory: './environments/dev/aws/compute' # Path to your Terraform code
         framework: 'terraform'
         soft-fail: false # Set to true if you want to allow failures without blocking the pipeline
 
