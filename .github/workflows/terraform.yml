@@ -50,10 +50,12 @@ jobs:
 
     # 4. Check Code Formatting
     - name: Terraform Format Check
+      working-directory: ${{ env.CONFIG_DIRECTORY }}
       run: terraform fmt -check
 
     # 5. Initialize Backend and Providers
     - name: Terraform Init
+      working-directory: ${{ env.CONFIG_DIRECTORY }}
       run: terraform init
 
     # 6. Run Security Scan (Static Analysis)
@@ -99,7 +101,7 @@ jobs:
       uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
       id: plan-run
       with:
-        workspace: ${{ env.TF_WORKSPACE }}
+        workspace: ${{ var }}
         configuration_version: ${{ steps.plan-upload.outputs.configuration_version_id }}
         plan_only: true
 
