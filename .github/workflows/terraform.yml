@@ -115,3 +115,8 @@ jobs:
     - name: Terraform Apply
       working-directory: ${{ env.CONFIG_DIRECTORY }}
       run: terraform apply -auto-approve -input=false tfplan
+
+    # 8. Destroy Changes to avoid cost 
+   # - name: Terraform Destroy
+   #   working-directory: ${{ env.CONFIG_DIRECTORY }}
+   #   run: terraform destroy -auto-approve -input=false      
