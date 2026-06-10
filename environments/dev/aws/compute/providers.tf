@@ -6,10 +6,10 @@ provider "aws" {
     tags = var.common_tags
   }
 
-  assume_role {
-    role_arn     = "arn:aws:iam::${var.AWS_ACCOUNT_ID}:role/github-actions-terraform-eks"
-    session_name = "terraform-session"
-  }
+  # assume_role {
+  #   role_arn     = "arn:aws:iam::${var.AWS_ACCOUNT_ID}:role/github-actions-terraform-eks"
+  #   session_name = "terraform-session"
+  # }
 }
 
 provider "aws" {
