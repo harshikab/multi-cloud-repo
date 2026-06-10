@@ -109,7 +109,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "primary_encryptio
     bucket_key_enabled = true #  CRITICAL: Drastically reduces S3-to-KMS API request costs
 
     apply_server_side_encryption_by_default {
-      kms_master_key_id = var.s3_encryption_alias.arn # FIX: AWS-0132
+      kms_master_key_id = aws_kms_alias.s3_encryption_alias.arn # FIX: AWS-0132
       sse_algorithm     = "aws:kms"
     }
   }
@@ -181,7 +181,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "dependent_encrypt
     bucket_key_enabled = true #  CRITICAL: Drastically reduces S3-to-KMS API request costs
 
     apply_server_side_encryption_by_default {
-      kms_master_key_id = var.s3_encryption_alias.arn # FIX: AWS-0132
+      kms_master_key_id = aws_kms_alias.s3_encryption_alias.arn # FIX: AWS-0132
       sse_algorithm     = "aws:kms"
     }
   }
