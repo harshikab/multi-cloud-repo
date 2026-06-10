@@ -1,6 +1,5 @@
-resource "aws_key_pair" "key_pair" {
-  key_name   = "terraform-key-pair"
-  public_key = file("~/.ssh/id_rsa.pub")
+data "aws_instance_profile" "ec2_instance_profile" {
+  name = var.EC2_ROLE_NAME
 }
 
 resource "aws_instance" "web_server" {
@@ -21,7 +20,8 @@ resource "aws_instance" "web_server" {
     }
 
   }
-  key_name = aws_key_pair.key_pair.key_name
+  iam_instance_profile = data.aws_instance_profile.ec2_instance_profile.name
+  #key_name = aws_key_pair.key_pair.key_name
   tags = merge(var.common_tags, {
     Name = "terraform-web-server-${count.index + 1}"
   })

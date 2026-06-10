@@ -88,3 +88,9 @@ variable "log_sharing_bucket_id" {
   description = "The ID of the S3 bucket to share logs with across accounts"
   default     = "harshika-s3-logging"
 }
+
+variable "EC2_ROLE_NAME" {
+  type        = string
+  description = "The name of the IAM role to create for EC2 instances"
+  default     = ""
+}

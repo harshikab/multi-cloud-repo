@@ -20,6 +20,7 @@ env:
   CONFIG_DIRECTORY: "./environments/dev/aws/compute"
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   TF_VAR_AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  TF_VAR_EC2_ROLE_NAME: "github-actions-terraform-compute"
       
       # Pass the non-sensitive configuration parameters directly
   TF_VAR_instance_count: 1
@@ -102,12 +103,6 @@ jobs:
       id: trufflehog-secrets
       if: steps.trufflehog.outcome == 'failure' 
       run: exit 0
-
-# 1. Install the standard Terraform CLI on the runner
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
 
     # 3. Run the plan directly on the runner hardware
