@@ -19,6 +19,18 @@ env:
   TF_WORKSPACE: "default"
   CONFIG_DIRECTORY: "./environments/dev/aws/compute"
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  TF_VAR_AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      
+      # Pass the non-sensitive configuration parameters directly
+  TF_VAR_instance_count: 1
+  TF_VAR_environment: "dev"
+  TF_VAR_region: "us-east-1"
+  TF_VAR_availability_zones: '["us-east-1a", "us-east-1b", "us-east-1c"]'  
+  TF_VAR_github_repo_url: "https://github.com/harshikab/web-app.git"
+  TF_VAR_github_runner_token: "{{ secrets.GH_RUNNER_TOKEN }}"
+
+
+
   #AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   #AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   # Azure OIDC Configuration (Read natively by the azurerm provider)
@@ -97,10 +109,6 @@ jobs:
       with:
         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-    # 2. Initialize the working directory (Points to your remote TFC backend automatically)
-    - name: Terraform Init
-      run: terraform init
-      working-directory: ${{ env.CONFIG_DIRECTORY }}
 
     # 3. Run the plan directly on the runner hardware
     - name: Terraform Plan
