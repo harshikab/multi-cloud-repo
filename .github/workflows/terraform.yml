@@ -121,4 +121,6 @@ jobs:
     # 8. Destroy Changes to avoid cost 
     - name: Terraform Destroy
       working-directory: ${{ env.CONFIG_DIRECTORY }}
-      run: terraform destroy -auto-approve -input=false      
+      run: terraform destroy -auto-approve -input=false  tfplan
+      env:
+        TF_VAR_availability_zones: '["us-east-1a", "us-east-1b", "us-east-1c"]' 
