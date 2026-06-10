@@ -106,13 +106,12 @@ jobs:
 
 
     # 3. Run the plan directly on the runner hardware
-    - name: Terraform Plan
-      id: plan
-      run: terraform plan -no-color -input=false
+    - name: Terraform Plan      
+      run: terraform plan -out=tfplan -no-color -input=false
       working-directory: ${{ env.CONFIG_DIRECTORY }}
 
 
     # 8. Apply Changes (Only on merge/push to main branch)
-    #- name: Terraform Apply
-    #  if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    #  run: terraform apply -auto-approve -input=false
+   # - name: Terraform Apply
+   #   working-directory: ${{ env.CONFIG_DIRECTORY }}
+   #   run: terraform apply -auto-approve -input=false tfplan
