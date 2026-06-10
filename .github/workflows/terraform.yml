@@ -26,7 +26,7 @@ env:
   TF_VAR_instance_count: 1
   TF_VAR_environment: "dev"
   TF_VAR_region: "us-east-1"
-  TF_VAR_availability_zones: '["us-east-1a", "us-east-1b", "us-east-1c"]'  
+   
   TF_VAR_github_repo_url: "https://github.com/harshikab/web-app.git"
   TF_VAR_github_runner_token: "{{ secrets.GH_RUNNER_TOKEN }}"
 
@@ -106,7 +106,9 @@ jobs:
 
 
     # 3. Run the plan directly on the runner hardware
-    - name: Terraform Plan      
+    - name: Terraform Plan     
+      env:
+        TF_VAR_availability_zones: '["us-east-1a", "us-east-1b", "us-east-1c"]'      
       run: terraform plan -out=tfplan -no-color -input=false
       working-directory: ${{ env.CONFIG_DIRECTORY }}
 
@@ -117,6 +119,6 @@ jobs:
       run: terraform apply -auto-approve -input=false tfplan
 
     # 8. Destroy Changes to avoid cost 
-   # - name: Terraform Destroy
-   #   working-directory: ${{ env.CONFIG_DIRECTORY }}
-   #   run: terraform destroy -auto-approve -input=false      
+    - name: Terraform Destroy
+      working-directory: ${{ env.CONFIG_DIRECTORY }}
+      run: terraform destroy -auto-approve -input=false      
