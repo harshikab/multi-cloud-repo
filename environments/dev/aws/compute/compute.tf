@@ -1,5 +1,5 @@
 data "aws_iam_instance_profile" "ec2_instance_profile" {
-  name = var.EC2_ROLE_NAME
+  role = var.EC2_ROLE_NAME
 }
 
 resource "aws_instance" "web_server" {

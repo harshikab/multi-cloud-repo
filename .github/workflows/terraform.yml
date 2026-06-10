@@ -112,6 +112,6 @@ jobs:
 
 
     # 8. Apply Changes (Only on merge/push to main branch)
-   # - name: Terraform Apply
-   #   working-directory: ${{ env.CONFIG_DIRECTORY }}
-   #   run: terraform apply -auto-approve -input=false tfplan
+    - name: Terraform Apply
+      working-directory: ${{ env.CONFIG_DIRECTORY }}
+      run: terraform apply -auto-approve -input=false tfplan
