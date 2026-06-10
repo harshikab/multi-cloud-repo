@@ -1,4 +1,4 @@
-data "aws_instance_profile" "ec2_instance_profile" {
+data "aws_iam_instance_profile" "ec2_instance_profile" {
   name = var.EC2_ROLE_NAME
 }
 
@@ -20,7 +20,7 @@ resource "aws_instance" "web_server" {
     }
 
   }
-  iam_instance_profile = data.aws_instance_profile.ec2_instance_profile.name
+  iam_instance_profile = data.aws_iam_instance_profile.ec2_instance_profile.name
   #key_name = aws_key_pair.key_pair.key_name
   tags = merge(var.common_tags, {
     Name = "terraform-web-server-${count.index + 1}"
@@ -116,7 +116,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "primary_encryptio
 }
 
 # Lifecycle for Primary Buckets
-resource "aws_s3_bucket_lifecycle_configuration_v2" "primary_lifecycle" {
+resource "aws_s3_bucket_lifecycle_configuration" "primary_lifecycle" {
   provider = aws.destination
   count    = length(var.bucket_name)
   bucket   = aws_s3_bucket.s3-bucket-primary[count.index].id
@@ -188,7 +188,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "dependent_encrypt
 }
 
 # Lifecycle for Dependent Buckets
-resource "aws_s3_bucket_lifecycle_configuration_v2" "dependent_lifecycle" {
+resource "aws_s3_bucket_lifecycle_configuration" "dependent_lifecycle" {
   provider = aws.destination
   for_each = var.dependent_bucket_name
   bucket   = aws_s3_bucket.s3-bucket-dependent[each.key].id
