@@ -18,7 +18,9 @@ env:
   AWS_ROLE_TO_ASSUME: "arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-terraform-eks"
   TF_WORKSPACE: "default"
   CONFIG_DIRECTORY: "./environments/dev/aws/compute"
-  
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   # Azure OIDC Configuration (Read natively by the azurerm provider)
   #ARM_USE_OIDC: "true"
   #ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
