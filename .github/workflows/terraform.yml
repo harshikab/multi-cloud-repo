@@ -20,7 +20,7 @@ env:
   CONFIG_DIRECTORY: "./environments/dev/aws/compute"
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
   TF_VAR_AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-  TF_VAR_EC2_ROLE_NAME: "github-actions-terraform-compute"
+  TF_VAR_EC2_ROLE_NAME: "github-actions-terraform-eks"
       
       # Pass the non-sensitive configuration parameters directly
   TF_VAR_instance_count: 1
